@@ -1,0 +1,68 @@
+# Cloud VPS Environment Setup Guide
+
+## Environment Variables Configuration
+
+Zkopírujte tento soubor jako `ENVIRONMENT-SETUP.md` a vyplňte skutečné hodnoty.
+
+### Required Environment Variables
+
+```env
+# Server Configuration
+NODE_ENV=development
+PORT=3000
+HOSTNAME=0.0.0.0
+
+# NextAuth.js Configuration
+NEXTAUTH_URL=http://localhost:3000
+NEXTAUTH_SECRET=your-nextauth-secret-key-here
+
+# Google OAuth Configuration (REQUIRED)
+GOOGLE_CLIENT_ID=your-google-client-id.apps.googleusercontent.com
+GOOGLE_CLIENT_SECRET=your-google-client-secret
+
+# HostBill API Configuration
+HOSTBILL_BASE_URL=https://your-hostbill-domain.com
+HOSTBILL_API_URL=https://your-hostbill-domain.com/admin/api.php
+HOSTBILL_API_ID=your-hostbill-api-id
+HOSTBILL_API_KEY=your-hostbill-api-key
+
+# Middleware Configuration
+MIDDLEWARE_URL=http://localhost:3005
+NEXT_PUBLIC_MIDDLEWARE_URL=http://localhost:3005
+MIDDLEWARE_API_SECRET=your_secret_key_here
+
+# Affiliate Settings
+NEXT_PUBLIC_AFFILIATE_DEBUG=true
+ADMIN_EMAIL=admin@yourdomain.com
+
+# Google Maps API Configuration
+NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=your-google-maps-api-key
+```
+
+## Setup Instructions
+
+1. **Google OAuth Setup:**
+   - Jděte na https://console.cloud.google.com/
+   - Vytvořte nový projekt nebo vyberte existující
+   - Povolte Google+ API
+   - Vytvořte OAuth 2.0 Client ID
+   - Přidejte authorized origins: `http://localhost:3000`
+   - Přidejte redirect URIs: `http://localhost:3000/api/auth/callback/google`
+
+2. **HostBill API Setup:**
+   - Přihlaste se do HostBill admin panelu
+   - Jděte do Settings > API
+   - Vytvořte nový API klíč
+   - Zkopírujte API ID, Key a Secret
+
+3. **Google Maps API:**
+   - V Google Cloud Console povolte Maps JavaScript API
+   - Vytvořte API klíč pro Maps
+   - Omezte klíč na vaši doménu
+
+## Security Notes
+
+- Nikdy necommitujte skutečné API klíče do Git
+- Používejte různé klíče pro development a production
+- Pravidelně rotujte API klíče
+- Omezte API klíče na konkrétní domény/IP adresy

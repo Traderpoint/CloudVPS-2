@@ -1,0 +1,68 @@
+# Test Portal Environment Analysis - Template
+
+## Environment Variables Template
+
+Zkopírujte tento soubor jako `TEST_PORTAL_ENV_ANALYSIS.md` a vyplňte skutečné hodnoty.
+
+### ✅ Google OAuth proměnné:
+```env
+GOOGLE_CLIENT_ID=your-google-client-id.apps.googleusercontent.com
+GOOGLE_CLIENT_SECRET=your-google-client-secret
+NEXTAUTH_URL=http://localhost:3000
+NEXTAUTH_SECRET=your-nextauth-secret-key
+```
+
+### ✅ Affiliate a Product proměnné:
+```env
+NEXT_PUBLIC_AFFILIATE_DEBUG=true
+DEFAULT_AFFILIATE_ID=2
+NEXT_PUBLIC_DEFAULT_AFFILIATE_ID=2
+```
+
+### ✅ HostBill API proměnné:
+```env
+HOSTBILL_URL=https://your-hostbill-domain.com
+HOSTBILL_API_ID=your-hostbill-api-id
+HOSTBILL_API_KEY=your-hostbill-api-key
+HOSTBILL_API_SECRET=your-hostbill-api-secret
+HOSTBILL_API_URL=https://your-hostbill-domain.com/admin/api.php
+```
+
+### ✅ Middleware proměnné:
+```env
+MIDDLEWARE_URL=http://localhost:3005
+NEXT_PUBLIC_MIDDLEWARE_URL=http://localhost:3005
+MIDDLEWARE_API_SECRET=your_secret_key_here
+```
+
+### ✅ Payment Testing proměnné:
+```env
+PAYMENT_TEST_MODE=true
+PAYMENT_TEST_AMOUNT=1
+PAYMENT_TEST_CURRENCY=CZK
+PAYMENT_SIMULATE_SUCCESS=true
+```
+
+## Testovací scénáře
+
+1. **Google OAuth Test:**
+   - Ověřte, že Google OAuth funguje správně
+   - Zkontrolujte redirect URLs
+   - Otestujte přihlášení a odhlášení
+
+2. **HostBill API Test:**
+   - Otestujte připojení k HostBill API
+   - Ověřte affiliate tracking
+   - Zkontrolujte vytváření objednávek
+
+3. **Payment Flow Test:**
+   - Otestujte payment gateway integrace
+   - Ověřte callback handling
+   - Zkontrolujte invoice marking
+
+## Security Notes
+
+- Tento soubor obsahuje citlivé informace
+- Nikdy ho necommitujte do Git
+- Používejte různé hodnoty pro test a production
+- Pravidelně rotujte API klíče
