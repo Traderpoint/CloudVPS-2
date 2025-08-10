@@ -26,6 +26,10 @@ yarn-error.log*
 .env*.local
 .env
 
+# Documentation files with sensitive information
+ENVIRONMENT-SETUP.md
+TEST_PORTAL_ENV_ANALYSIS.md
+
 # Vercel
 .vercel
 
