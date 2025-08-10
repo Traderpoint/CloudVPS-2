@@ -2,6 +2,40 @@
 
 Complete HostBill API Gateway and Middleware with modern Next.js dashboard interface.
 
+## 🚀 Next.js 15+ Kompatibilita
+
+Všechny stránky s NextAuth session managementem byly upraveny pro plnou kompatibilitu s Next.js 15+ a Turbopackem.
+
+### ✅ Upravené/Přidané stránky:
+
+- `pages/auth-test.js` - Test autentifikace
+- `pages/cart.js` - Nákupní košík
+- `pages/client-area.js` - Klientská zóna
+- `pages/middleware-oauth-tests.js` - OAuth testy (upraveno)
+- `pages/oauth-success.js` - Úspěšné OAuth přihlášení
+- `pages/register.js` - Registrace
+- `pages/test-google-nextauth.js` - Google OAuth test
+
+### 🔧 Utilita pro session management:
+
+Všechny stránky používají společnou utilitu `lib/getServerSessionProps.js`:
+
+```javascript
+import { getServerSessionProps } from '../lib/getServerSessionProps';
+
+export default function MyPage({ serverSession }) {
+  const { data: clientSession } = useSession();
+  const session = clientSession ?? serverSession;
+  // session je vždy dostupná, žádné loading stavy
+}
+
+export const getServerSideProps = getServerSessionProps;
+```
+
+### 📚 Dokumentace:
+
+Kompletní dokumentace je v souboru `NEXTJS-15-COMPATIBILITY.md`.
+
 ## 🚀 Features
 
 ### **Full Middleware Functionality:**
