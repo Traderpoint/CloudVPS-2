@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test URL Parameters</title>
+</head>
+<body>
+    <h1>URL Parameters Test</h1>
+    <div id="params"></div>
+    
+    <script>
+        // Parse URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const params = {};
+        
+        for (const [key, value] of urlParams) {
+            params[key] = value;
+        }
+        
+        // Display parameters
+        document.getElementById('params').innerHTML = `
+            <h2>URL Parameters:</h2>
+            <pre>${JSON.stringify(params, null, 2)}</pre>
+            
+            <h2>Specific Values:</h2>
+            <p><strong>Amount:</strong> ${params.amount || 'Not provided'}</p>
+            <p><strong>Currency:</strong> ${params.currency || 'Not provided'}</p>
+            <p><strong>Order ID:</strong> ${params.orderId || 'Not provided'}</p>
+            <p><strong>Invoice ID:</strong> ${params.invoiceId || 'Not provided'}</p>
+            <p><strong>Transaction ID:</strong> ${params.transactionId || 'Not provided'}</p>
+            <p><strong>Payment Method:</strong> ${params.paymentMethod || 'Not provided'}</p>
+            
+            <h2>Parsed Amount:</h2>
+            <p><strong>parseFloat(amount):</strong> ${parseFloat(params.amount) || 'NaN'}</p>
+            <p><strong>Amount || 100:</strong> ${parseFloat(params.amount) || 100}</p>
+        `;
+        
+        console.log('URL Parameters:', params);
+        console.log('Amount:', params.amount);
+        console.log('Parsed Amount:', parseFloat(params.amount));
+    </script>
+</body>
+</html>

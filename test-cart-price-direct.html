@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Direct Cart Price Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ccc; }
+        .result { background: #f0f0f0; padding: 10px; margin: 10px 0; }
+        .error { background: #ffebee; color: #c62828; }
+        .success { background: #e8f5e8; color: #2e7d32; }
+        button { padding: 10px 20px; margin: 5px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Direct Cart Price Test</h1>
+    
+    <div class="test-section">
+        <h2>1. Test Cart Settings Setup</h2>
+        <button onclick="setupCartSettings()">Setup 24 měsíců + Windows</button>
+        <button onclick="setupCartSettings12()">Setup 12 měsíců + Linux</button>
+        <button onclick="setupCartSettings1()">Setup 1 měsíc + Linux</button>
+        <div id="cartSetupResult" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>2. Test Price Calculation</h2>
+        <button onclick="testPriceCalculation()">Calculate Cart Total</button>
+        <div id="priceCalcResult" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>3. Test Payment Initialization</h2>
+        <button onclick="testPaymentInit()">Test Payment Init</button>
+        <div id="paymentInitResult" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>4. Direct CURL Test</h2>
+        <button onclick="generateCurlCommand()">Generate CURL Command</button>
+        <div id="curlResult" class="result"></div>
+    </div>
+
+    <script>
+        function setupCartSettings() {
+            const cartSettings = {
+                selectedPeriod: '24',
+                selectedOS: 'windows',
+                selectedApps: ['wordpress', 'mysql'],
+                appliedPromo: null,
+                timestamp: new Date().toISOString()
+            };
+            
+            sessionStorage.setItem('cartSettings', JSON.stringify(cartSettings));
+            
+            document.getElementById('cartSetupResult').innerHTML = `
+                <div class="success">✅ Cart settings saved:</div>
+                <pre>${JSON.stringify(cartSettings, null, 2)}</pre>
+            `;
+        }
+
+        function setupCartSettings12() {
+            const cartSettings = {
+                selectedPeriod: '12',
+                selectedOS: 'linux',
+                selectedApps: ['wordpress'],
+                appliedPromo: null,
+                timestamp: new Date().toISOString()
+            };
+            
+            sessionStorage.setItem('cartSettings', JSON.stringify(cartSettings));
+            
+            document.getElementById('cartSetupResult').innerHTML = `
+                <div class="success">✅ Cart settings saved:</div>
+                <pre>${JSON.stringify(cartSettings, null, 2)}</pre>
+            `;
+        }
+
+        function setupCartSettings1() {
+            const cartSettings = {
+                selectedPeriod: '1',
+                selectedOS: 'linux',
+                selectedApps: [],
+                appliedPromo: null,
+                timestamp: new Date().toISOString()
+            };
+            
+            sessionStorage.setItem('cartSettings', JSON.stringify(cartSettings));
+            
+            document.getElementById('cartSetupResult').innerHTML = `
+                <div class="success">✅ Cart settings saved:</div>
+                <pre>${JSON.stringify(cartSettings, null, 2)}</pre>
+            `;
+        }
+
+        function testPriceCalculation() {
+            const cartSettings = JSON.parse(sessionStorage.getItem('cartSettings') || '{}');
+            
+            if (!cartSettings.selectedPeriod) {
+                document.getElementById('priceCalcResult').innerHTML = `
+                    <div class="error">❌ No cart settings found. Setup cart settings first.</div>
+                `;
+                return;
+            }
+
+            // Simulate price calculation logic
+            const basePrice = 299; // VPS Basic base price
+            const selectedPeriod = cartSettings.selectedPeriod;
+            const selectedOS = cartSettings.selectedOS;
+            
+            const periods = [
+                { value: '1', discount: 0 },
+                { value: '3', discount: 5 },
+                { value: '6', discount: 10 },
+                { value: '12', discount: 20 },
+                { value: '24', discount: 30 },
+                { value: '36', discount: 40 }
+            ];
+            
+            const operatingSystems = [
+                { id: 'linux', priceModifier: 0 },
+                { id: 'windows', priceModifier: 500 }
+            ];
+            
+            const period = periods.find(p => p.value === selectedPeriod);
+            const os = operatingSystems.find(o => o.id === selectedOS);
+            const billingPeriodMonths = parseInt(selectedPeriod);
+            
+            // Calculate total price for billing period
+            const monthlyPriceWithOS = basePrice + (os?.priceModifier || 0);
+            const totalBeforeDiscount = monthlyPriceWithOS * billingPeriodMonths;
+            const totalAfterDiscount = totalBeforeDiscount * (1 - (period?.discount || 0) / 100);
+            
+            const calculation = {
+                basePrice: basePrice + ' CZK/měsíc',
+                selectedPeriod: selectedPeriod + ' měsíců',
+                selectedOS: selectedOS,
+                osModifier: (os?.priceModifier || 0) + ' CZK/měsíc',
+                monthlyPriceWithOS: monthlyPriceWithOS + ' CZK/měsíc',
+                totalBeforeDiscount: totalBeforeDiscount + ' CZK',
+                periodDiscount: (period?.discount || 0) + '%',
+                totalAfterDiscount: Math.round(totalAfterDiscount) + ' CZK',
+                finalAmount: Math.round(totalAfterDiscount)
+            };
+            
+            document.getElementById('priceCalcResult').innerHTML = `
+                <div class="success">✅ Price calculation:</div>
+                <pre>${JSON.stringify(calculation, null, 2)}</pre>
+                <div><strong>FINAL AMOUNT TO SEND TO GATEWAY: ${Math.round(totalAfterDiscount)} CZK</strong></div>
+            `;
+            
+            // Store calculated amount for payment test
+            sessionStorage.setItem('calculatedAmount', Math.round(totalAfterDiscount));
+        }
+
+        function testPaymentInit() {
+            const cartSettings = JSON.parse(sessionStorage.getItem('cartSettings') || '{}');
+            const calculatedAmount = sessionStorage.getItem('calculatedAmount');
+            
+            if (!calculatedAmount) {
+                document.getElementById('paymentInitResult').innerHTML = `
+                    <div class="error">❌ No calculated amount. Run price calculation first.</div>
+                `;
+                return;
+            }
+            
+            const paymentData = {
+                orderId: 'TEST-CART-' + Date.now(),
+                invoiceId: '470',
+                method: 'comgate',
+                amount: parseInt(calculatedAmount),
+                currency: 'CZK',
+                billingPeriod: cartSettings.selectedPeriod,
+                billingCycle: mapBillingPeriod(cartSettings.selectedPeriod),
+                selectedOS: cartSettings.selectedOS,
+                selectedApps: cartSettings.selectedApps,
+                cartSettings: {
+                    selectedPeriod: cartSettings.selectedPeriod,
+                    selectedOS: cartSettings.selectedOS,
+                    periodDiscount: getPeriodDiscount(cartSettings.selectedPeriod),
+                    osModifier: getOSModifier(cartSettings.selectedOS)
+                }
+            };
+            
+            document.getElementById('paymentInitResult').innerHTML = `
+                <div class="success">✅ Payment initialization data:</div>
+                <pre>${JSON.stringify(paymentData, null, 2)}</pre>
+                <div><strong>AMOUNT TO SEND: ${paymentData.amount} CZK</strong></div>
+            `;
+            
+            // Store for CURL generation
+            sessionStorage.setItem('paymentData', JSON.stringify(paymentData));
+        }
+
+        function generateCurlCommand() {
+            const paymentData = JSON.parse(sessionStorage.getItem('paymentData') || '{}');
+            
+            if (!paymentData.orderId) {
+                document.getElementById('curlResult').innerHTML = `
+                    <div class="error">❌ No payment data. Run payment initialization test first.</div>
+                `;
+                return;
+            }
+            
+            const curlCommand = `curl -X POST http://localhost:3005/api/payments/initialize \\
+  -H "Content-Type: application/json" \\
+  -d '${JSON.stringify(paymentData)}'`;
+            
+            document.getElementById('curlResult').innerHTML = `
+                <div class="success">✅ CURL command generated:</div>
+                <pre style="background: #000; color: #0f0; padding: 10px; overflow-x: auto;">${curlCommand}</pre>
+                <button onclick="copyToClipboard('${curlCommand.replace(/'/g, "\\'")}')">Copy to Clipboard</button>
+                <div><strong>Expected: ComGate should receive ${paymentData.amount} CZK</strong></div>
+            `;
+        }
+
+        function mapBillingPeriod(period) {
+            const mapping = {
+                '1': 'm', '3': 'q', '6': 's', 
+                '12': 'a', '24': 'b', '36': 't'
+            };
+            return mapping[period] || 'm';
+        }
+
+        function getPeriodDiscount(period) {
+            const discounts = {
+                '1': 0, '3': 5, '6': 10, 
+                '12': 20, '24': 30, '36': 40
+            };
+            return discounts[period] || 0;
+        }
+
+        function getOSModifier(os) {
+            const modifiers = {
+                'linux': 0,
+                'windows': 500
+            };
+            return modifiers[os] || 0;
+        }
+
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                alert('CURL command copied to clipboard!');
+            });
+        }
+    </script>
+</body>
+</html>

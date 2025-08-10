@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Cart Persistence Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { border: 1px solid #ccc; margin: 10px 0; padding: 15px; }
+        .success { color: green; }
+        .error { color: red; }
+        .info { color: blue; }
+        button { margin: 5px; padding: 10px; }
+        pre { background: #f5f5f5; padding: 10px; overflow: auto; }
+    </style>
+</head>
+<body>
+    <h1>🛒 Cart Persistence Test</h1>
+    
+    <div class="test-section">
+        <h2>Current localStorage State</h2>
+        <div id="current-state"></div>
+        <button onclick="refreshState()">Refresh State</button>
+    </div>
+
+    <div class="test-section">
+        <h2>Test Actions</h2>
+        <button onclick="createTestCart()">Create Test Cart</button>
+        <button onclick="addItemToCart()">Add Item to Cart</button>
+        <button onclick="clearCart()">Clear Cart</button>
+        <button onclick="simulateRefresh()">Simulate Page Refresh</button>
+    </div>
+
+    <div class="test-section">
+        <h2>Test Results</h2>
+        <div id="test-results"></div>
+    </div>
+
+    <script>
+        let testResults = [];
+
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            testResults.push({ timestamp, message, type });
+            updateResults();
+            console.log(`[${timestamp}] ${message}`);
+        }
+
+        function updateResults() {
+            const resultsDiv = document.getElementById('test-results');
+            resultsDiv.innerHTML = testResults.map(result => 
+                `<div class="${result.type}">[${result.timestamp}] ${result.message}</div>`
+            ).join('');
+        }
+
+        function refreshState() {
+            const cartData = localStorage.getItem('cart');
+            const affiliateData = localStorage.getItem('affiliate_data');
+            const hbAffiliateData = localStorage.getItem('hb_affiliate_data');
+            
+            const stateDiv = document.getElementById('current-state');
+            stateDiv.innerHTML = `
+                <h3>localStorage Contents:</h3>
+                <div><strong>cart:</strong> ${cartData ? 'EXISTS' : 'NOT FOUND'}</div>
+                <div><strong>affiliate_data:</strong> ${affiliateData ? 'EXISTS' : 'NOT FOUND'}</div>
+                <div><strong>hb_affiliate_data:</strong> ${hbAffiliateData ? 'EXISTS' : 'NOT FOUND'}</div>
+                
+                ${cartData ? `
+                    <h4>Cart Data:</h4>
+                    <pre>${JSON.stringify(JSON.parse(cartData), null, 2)}</pre>
+                ` : ''}
+            `;
+        }
+
+        function createTestCart() {
+            const testCart = {
+                items: [
+                    {
+                        id: 1,
+                        name: 'VPS Start',
+                        cpu: '2 jádra',
+                        ram: '4 GB',
+                        storage: '50 GB',
+                        price: '249 Kč',
+                        quantity: 2,
+                        hostbillPid: 5
+                    },
+                    {
+                        id: 2,
+                        name: 'VPS Profi',
+                        cpu: '4 jádra',
+                        ram: '8 GB',
+                        storage: '100 GB',
+                        price: '499 Kč',
+                        quantity: 1,
+                        hostbillPid: 10
+                    }
+                ],
+                total: 1247,
+                itemCount: 3,
+                affiliateId: '1',
+                affiliateCode: 'test'
+            };
+
+            try {
+                localStorage.setItem('cart', JSON.stringify(testCart));
+                log('✅ Test cart created successfully', 'success');
+                
+                // Verify it was saved
+                const saved = localStorage.getItem('cart');
+                if (saved) {
+                    const parsed = JSON.parse(saved);
+                    log(`✅ Cart verification: ${parsed.items.length} items, total: ${parsed.total}`, 'success');
+                } else {
+                    log('❌ Cart verification failed - not found in localStorage', 'error');
+                }
+            } catch (error) {
+                log(`❌ Error creating test cart: ${error.message}`, 'error');
+            }
+            
+            refreshState();
+        }
+
+        function addItemToCart() {
+            try {
+                const existingCart = localStorage.getItem('cart');
+                let cart;
+                
+                if (existingCart) {
+                    cart = JSON.parse(existingCart);
+                } else {
+                    cart = { items: [], total: 0, itemCount: 0, affiliateId: null, affiliateCode: null };
+                }
+
+                // Add new item
+                const newItem = {
+                    id: Date.now(),
+                    name: 'Test VPS',
+                    cpu: '1 jádro',
+                    ram: '2 GB',
+                    storage: '25 GB',
+                    price: '199 Kč',
+                    quantity: 1,
+                    hostbillPid: 3
+                };
+
+                cart.items.push(newItem);
+                cart.itemCount = cart.items.reduce((total, item) => total + item.quantity, 0);
+                cart.total = cart.items.reduce((total, item) => {
+                    const price = parseFloat(item.price.replace(/[^\d]/g, ''));
+                    return total + (price * item.quantity);
+                }, 0);
+
+                localStorage.setItem('cart', JSON.stringify(cart));
+                log(`✅ Item added to cart. New total: ${cart.itemCount} items`, 'success');
+            } catch (error) {
+                log(`❌ Error adding item to cart: ${error.message}`, 'error');
+            }
+            
+            refreshState();
+        }
+
+        function clearCart() {
+            try {
+                localStorage.removeItem('cart');
+                log('✅ Cart cleared from localStorage', 'success');
+            } catch (error) {
+                log(`❌ Error clearing cart: ${error.message}`, 'error');
+            }
+            
+            refreshState();
+        }
+
+        function simulateRefresh() {
+            log('🔄 Simulating page refresh...', 'info');
+            
+            // Save current state
+            const beforeRefresh = localStorage.getItem('cart');
+            log(`📋 Before refresh: ${beforeRefresh ? 'Cart exists' : 'No cart'}`, 'info');
+            
+            // Simulate what happens on page load
+            setTimeout(() => {
+                const afterRefresh = localStorage.getItem('cart');
+                log(`📋 After refresh: ${afterRefresh ? 'Cart exists' : 'No cart'}`, 'info');
+                
+                if (beforeRefresh && afterRefresh) {
+                    if (beforeRefresh === afterRefresh) {
+                        log('✅ Cart persistence test PASSED - data unchanged', 'success');
+                    } else {
+                        log('❌ Cart persistence test FAILED - data changed', 'error');
+                        log(`Before: ${beforeRefresh.substring(0, 100)}...`, 'error');
+                        log(`After: ${afterRefresh.substring(0, 100)}...`, 'error');
+                    }
+                } else if (!beforeRefresh && !afterRefresh) {
+                    log('✅ No cart before or after - consistent', 'success');
+                } else {
+                    log('❌ Cart persistence test FAILED - existence changed', 'error');
+                }
+                
+                refreshState();
+            }, 100);
+        }
+
+        // Initialize
+        refreshState();
+        log('🚀 Cart persistence test initialized', 'info');
+    </script>
+</body>
+</html>

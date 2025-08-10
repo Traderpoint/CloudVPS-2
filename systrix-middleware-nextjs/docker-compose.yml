@@ -1,0 +1,72 @@
+version: '3.8'
+
+services:
+  systrix-middleware:
+    build: .
+    ports:
+      - "3005:3005"
+    environment:
+      - NODE_ENV=production
+      - PORT=3005
+      - HOSTNAME=0.0.0.0
+      
+      # HostBill API Configuration
+      - HOSTBILL_BASE_URL=${HOSTBILL_BASE_URL:-https://vps.kabel1it.cz}
+      - HOSTBILL_API_URL=${HOSTBILL_API_URL:-https://vps.kabel1it.cz/admin/api.php}
+      - HOSTBILL_API_ID=${HOSTBILL_API_ID}
+      - HOSTBILL_API_KEY=${HOSTBILL_API_KEY}
+      
+      # Security Configuration
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost:3000,http://localhost:3006}
+      - RATE_LIMIT_WINDOW_MS=${RATE_LIMIT_WINDOW_MS:-900000}
+      - RATE_LIMIT_MAX_REQUESTS=${RATE_LIMIT_MAX_REQUESTS:-100}
+      
+      # Logging Configuration
+      - LOG_LEVEL=${LOG_LEVEL:-info}
+      - LOG_FILE=${LOG_FILE:-logs/middleware.log}
+      
+      # Payment processing
+      - PAYMENT_RETURN_URL=${PAYMENT_RETURN_URL:-http://localhost:3000/payment-return}
+      - PAYMENT_CANCEL_URL=${PAYMENT_CANCEL_URL:-http://localhost:3000/payment-cancel}
+      
+      # Comgate Payment Gateway Configuration
+      - COMGATE_API_URL=${COMGATE_API_URL:-https://payments.comgate.cz/v2.0}
+      - COMGATE_MERCHANT_ID=${COMGATE_MERCHANT_ID}
+      - COMGATE_SECRET=${COMGATE_SECRET}
+      - COMGATE_TEST_MODE=${COMGATE_TEST_MODE:-true}
+      - COMGATE_MOCK_MODE=${COMGATE_MOCK_MODE:-false}
+      
+      # Dashboard Configuration
+      - DASHBOARD_ENABLED=${DASHBOARD_ENABLED:-true}
+      - DASHBOARD_PATH=${DASHBOARD_PATH:-/dashboard}
+      
+      # CloudVPS Integration
+      - CLOUDVPS_URL=${CLOUDVPS_URL:-http://localhost:3000}
+      - PARTNERS_PORTAL_URL=${PARTNERS_PORTAL_URL:-http://localhost:3006}
+      - MIDDLEWARE_URL=${MIDDLEWARE_URL:-http://localhost:3005}
+      
+      # Product Mapping (Cloud VPS ID -> HostBill ID)
+      - PRODUCT_MAPPING_1=${PRODUCT_MAPPING_1:-5}
+      - PRODUCT_MAPPING_2=${PRODUCT_MAPPING_2:-10}
+      - PRODUCT_MAPPING_3=${PRODUCT_MAPPING_3:-11}
+      - PRODUCT_MAPPING_4=${PRODUCT_MAPPING_4:-12}
+      
+      # Payment Gateway Configuration
+      - HOSTBILL_GATEWAY_CARD=${HOSTBILL_GATEWAY_CARD:-1}
+      - HOSTBILL_GATEWAY_PAYPAL=${HOSTBILL_GATEWAY_PAYPAL:-2}
+      - HOSTBILL_GATEWAY_BANK=${HOSTBILL_GATEWAY_BANK:-3}
+      - HOSTBILL_GATEWAY_CRYPTO=${HOSTBILL_GATEWAY_CRYPTO:-4}
+      - HOSTBILL_GATEWAY_PAYU=${HOSTBILL_GATEWAY_PAYU:-5}
+      
+    volumes:
+      - middleware-logs:/app/logs
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3005/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+volumes:
+  middleware-logs:

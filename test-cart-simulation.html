@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Cart Simulation Test</title>
+</head>
+<body>
+    <h1>Cart Simulation Test</h1>
+    <div id="output"></div>
+
+    <script>
+        // Simulate CartContext behavior
+        const CART_ACTIONS = {
+            ADD_ITEM: 'ADD_ITEM',
+            UPDATE_QUANTITY: 'UPDATE_QUANTITY'
+        };
+
+        // Initial state
+        let cartState = {
+            items: [],
+            total: 0,
+            itemCount: 0
+        };
+
+        // Helper function to calculate totals
+        function calculateTotals(items) {
+            const itemCount = items.reduce((total, item) => total + item.quantity, 0);
+            const total = items.reduce((total, item) => {
+                const price = parseFloat(item.price.replace(/[^\d]/g, ''));
+                return total + (price * item.quantity);
+            }, 0);
+            return { itemCount, total };
+        }
+
+        // Reducer function
+        function cartReducer(state, action) {
+            switch (action.type) {
+                case CART_ACTIONS.ADD_ITEM: {
+                    const existingItem = state.items.find(item => item.id === action.payload.id);
+                    
+                    if (existingItem) {
+                        // Update quantity if item already exists
+                        const updatedItems = state.items.map(item =>
+                            item.id === action.payload.id
+                                ? { ...item, quantity: item.quantity + 1 }
+                                : item
+                        );
+                        return {
+                            ...state,
+                            items: updatedItems,
+                            ...calculateTotals(updatedItems)
+                        };
+                    } else {
+                        // Add new item
+                        const newItems = [...state.items, { ...action.payload, quantity: 1 }];
+                        return {
+                            ...state,
+                            items: newItems,
+                            ...calculateTotals(newItems)
+                        };
+                    }
+                }
+                default:
+                    return state;
+            }
+        }
+
+        // Simulate adding items
+        function addItem(item) {
+            cartState = cartReducer(cartState, { type: CART_ACTIONS.ADD_ITEM, payload: item });
+            updateDisplay();
+        }
+
+        function updateDisplay() {
+            const output = document.getElementById('output');
+            output.innerHTML = `
+                <h2>Cart State:</h2>
+                <pre>${JSON.stringify(cartState, null, 2)}</pre>
+                
+                <h2>Items Processing (like billing.js):</h2>
+                ${cartState.items.map((item, index) => {
+                    const itemPrice = parseFloat(item.price.replace(/[^\d]/g, ''));
+                    return `
+                        <div style="border: 1px solid #ccc; margin: 10px; padding: 10px;">
+                            <h3>Item ${index + 1}: ${item.name}</h3>
+                            <p>Original price: ${item.price}</p>
+                            <p>Parsed price: ${itemPrice}</p>
+                            <p><strong>Quantity: ${item.quantity}</strong></p>
+                            <p>Subtotal: ${itemPrice * item.quantity} Kč</p>
+                            <p>HostBill PID: ${item.hostbillPid}</p>
+                        </div>
+                    `;
+                }).join('')}
+            `;
+        }
+
+        // Test scenario: Add VPS Start twice, then VPS Profi once
+        console.log('🧪 Starting cart simulation...');
+        
+        const vpsStart = {
+            id: 1,
+            name: 'VPS Start',
+            cpu: '2 jádra',
+            ram: '4 GB',
+            storage: '50 GB',
+            price: '249 Kč',
+            hostbillPid: 5
+        };
+
+        const vpsProfi = {
+            id: 2,
+            name: 'VPS Profi',
+            cpu: '4 jádra',
+            ram: '8 GB',
+            storage: '100 GB',
+            price: '499 Kč',
+            hostbillPid: 10
+        };
+
+        // Initial display
+        updateDisplay();
+
+        // Add items with delay to see the progression
+        setTimeout(() => {
+            console.log('Adding VPS Start (1st time)...');
+            addItem(vpsStart);
+        }, 1000);
+
+        setTimeout(() => {
+            console.log('Adding VPS Start (2nd time)...');
+            addItem(vpsStart);
+        }, 2000);
+
+        setTimeout(() => {
+            console.log('Adding VPS Profi...');
+            addItem(vpsProfi);
+        }, 3000);
+
+        setTimeout(() => {
+            console.log('Final cart state:', cartState);
+            console.log('Expected: VPS Start quantity=2, VPS Profi quantity=1');
+        }, 4000);
+    </script>
+</body>
+</html>

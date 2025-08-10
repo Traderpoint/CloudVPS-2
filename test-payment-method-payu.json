@@ -1,0 +1,16 @@
+{
+  "orderId": "TEST-PAYMENT-METHOD-002",
+  "invoiceId": "INV-PAYMENT-METHOD-002",
+  "method": "payu",
+  "amount": 2000,
+  "currency": "CZK",
+  "customerData": {
+    "email": "test@example.com",
+    "name": "Test Customer"
+  },
+  "testFlow": true,
+  "returnUrl": "http://localhost:3000/payment-complete",
+  "billingPeriod": "12",
+  "selectedOS": "linux",
+  "appliedPromo": "SAVE10"
+}

@@ -1,0 +1,40 @@
+{
+  "cartId": "CART-1754432938972-71862fc0218e7f8b",
+  "customer": {
+    "firstName": "Test",
+    "lastName": "CartUser",
+    "email": "test.cart.1754432938971@example.com",
+    "phone": "+420123456789",
+    "address": "Cart Street 123",
+    "city": "Prague",
+    "postalCode": "12000",
+    "country": "CZ",
+    "company": "Cart Company"
+  },
+  "items": [
+    {
+      "productId": "1",
+      "name": "VPS Start",
+      "quantity": 1,
+      "price": 299,
+      "cycle": "m"
+    }
+  ],
+  "billing": {
+    "selectedPeriod": "m",
+    "selectedOS": "linux",
+    "selectedApps": [
+      "wordpress"
+    ]
+  },
+  "totals": {
+    "subtotal": 299,
+    "tax": 63,
+    "total": 362
+  },
+  "paymentMethod": "comgate",
+  "timestamp": "2025-08-05T22:28:58.972Z",
+  "expiresAt": "2025-08-06T22:28:58.973Z",
+  "status": "completed",
+  "updatedAt": "2025-08-05T22:28:58.979Z"
+}

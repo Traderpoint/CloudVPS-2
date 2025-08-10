@@ -1,0 +1,82 @@
+version: '3.8'
+
+services:
+  cloudvps:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - HOSTNAME=0.0.0.0
+      
+      # NextAuth.js Configuration
+      - NEXTAUTH_URL=${NEXTAUTH_URL:-http://localhost:3000}
+      - NEXTAUTH_SECRET=${NEXTAUTH_SECRET}
+      
+      # Google OAuth Configuration
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+      
+      # HostBill API Configuration
+      - HOSTBILL_BASE_URL=${HOSTBILL_BASE_URL:-https://vps.kabel1it.cz}
+      - HOSTBILL_API_URL=${HOSTBILL_API_URL:-https://vps.kabel1it.cz/admin/api.php}
+      - HOSTBILL_API_ID=${HOSTBILL_API_ID}
+      - HOSTBILL_API_KEY=${HOSTBILL_API_KEY}
+      
+      # Middleware Configuration
+      - MIDDLEWARE_URL=${MIDDLEWARE_URL:-http://localhost:3005}
+      - NEXT_PUBLIC_MIDDLEWARE_URL=${NEXT_PUBLIC_MIDDLEWARE_URL:-http://localhost:3005}
+      
+      # Public Configuration
+      - NEXT_PUBLIC_HOSTBILL_DOMAIN=${NEXT_PUBLIC_HOSTBILL_DOMAIN:-vps.kabel1it.cz}
+      - NEXT_PUBLIC_HOSTBILL_URL=${NEXT_PUBLIC_HOSTBILL_URL:-https://vps.kabel1it.cz}
+      - NEXT_PUBLIC_AFFILIATE_DEBUG=${NEXT_PUBLIC_AFFILIATE_DEBUG:-false}
+      
+      # Google Maps API (optional)
+      - NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=${NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}
+      
+      # Product Configuration
+      - PRODUCT_VPS_BASIC=${PRODUCT_VPS_BASIC:-1}
+      - PRODUCT_VPS_PRO=${PRODUCT_VPS_PRO:-2}
+      - PRODUCT_VPS_PREMIUM=${PRODUCT_VPS_PREMIUM:-3}
+      - PRODUCT_VPS_ENTERPRISE=${PRODUCT_VPS_ENTERPRISE:-4}
+      
+      # Default Settings
+      - DEFAULT_AFFILIATE_ID=${DEFAULT_AFFILIATE_ID:-2}
+      - ADMIN_EMAIL=${ADMIN_EMAIL:-admin@systrix.cz}
+      
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/auth/session"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    depends_on:
+      - middleware
+
+  # Optional: Include middleware in the same compose file
+  middleware:
+    image: systrix-middleware-nextjs:latest
+    ports:
+      - "3005:3005"
+    environment:
+      - NODE_ENV=production
+      - PORT=3005
+      - HOSTNAME=0.0.0.0
+      - HOSTBILL_API_URL=${HOSTBILL_API_URL:-https://vps.kabel1it.cz/admin/api.php}
+      - HOSTBILL_API_ID=${HOSTBILL_API_ID}
+      - HOSTBILL_API_KEY=${HOSTBILL_API_KEY}
+      - ALLOWED_ORIGINS=http://localhost:3000,http://localhost:3006
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3005/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+networks:
+  default:
+    name: cloudvps-network

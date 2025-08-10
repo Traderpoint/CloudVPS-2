@@ -1,0 +1,248 @@
+<mxfile host="app.diagrams.net" modified="2024-01-01T00:00:00.000Z" agent="5.0" etag="xxx" version="22.1.16" type="device">
+  <diagram name="VPS Complete Flow" id="vps-complete-flow">
+    <mxGraphModel dx="1422" dy="794" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        
+        <!-- Landing Page -->
+        <mxCell id="landing" value="🏠 Landing Page&#xa;(/)&#xa;&#xa;• Hero section&#xa;• VPS plans overview&#xa;• CTA: &quot;Vyberte si VPS plán&quot;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=12;align=center;" vertex="1" parent="1">
+          <mxGeometry x="80" y="40" width="160" height="100" as="geometry" />
+        </mxCell>
+        
+        <!-- VPS Selection -->
+        <mxCell id="vps" value="🖥️ VPS Selection&#xa;(/vps)&#xa;&#xa;• VPS Start, Profi, Expert, Ultra&#xa;• Pricing for different periods&#xa;• Affiliate tracking&#xa;• Add to cart buttons" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=12;align=center;" vertex="1" parent="1">
+          <mxGeometry x="320" y="40" width="160" height="100" as="geometry" />
+        </mxCell>
+        
+        <!-- Cart Configuration -->
+        <mxCell id="cart" value="🛒 Cart &amp; Configuration&#xa;(/cart)&#xa;&#xa;• Billing period (1-36 months)&#xa;• Operating system (Linux/Windows)&#xa;• Applications (WordPress, Docker, etc.)&#xa;• Promo codes&#xa;• Price calculation" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=12;align=center;" vertex="1" parent="1">
+          <mxGeometry x="560" y="40" width="160" height="100" as="geometry" />
+        </mxCell>
+        
+        <!-- Registration -->
+        <mxCell id="register" value="👤 Registration/Login&#xa;(/register, /login)&#xa;&#xa;• Google OAuth&#xa;• GitHub OAuth&#xa;• Email registration&#xa;• Form validation&#xa;• Session storage" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=12;align=center;" vertex="1" parent="1">
+          <mxGeometry x="800" y="40" width="160" height="100" as="geometry" />
+        </mxCell>
+        
+        <!-- Billing Information -->
+        <mxCell id="billing" value="📋 Billing Information&#xa;(/billing)&#xa;&#xa;• Personal details&#xa;• Company information (optional)&#xa;• Address details&#xa;• HostBill order creation&#xa;• Cart summary" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=12;align=center;" vertex="1" parent="1">
+          <mxGeometry x="80" y="200" width="160" height="100" as="geometry" />
+        </mxCell>
+        
+        <!-- Payment Method -->
+        <mxCell id="payment-method" value="💳 Payment Method&#xa;(/payment-method)&#xa;&#xa;• Comgate (default)&#xa;• PayPal&#xa;• Credit card form&#xa;• RealPaymentProcessor&#xa;• Payment initialization" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=12;align=center;" vertex="1" parent="1">
+          <mxGeometry x="320" y="200" width="160" height="100" as="geometry" />
+        </mxCell>
+        
+        <!-- Payment Gateway -->
+        <mxCell id="payment-gateway" value="🏦 Payment Gateway&#xa;(ComGate/PayPal)&#xa;&#xa;• Real transaction processing&#xa;• User payment completion&#xa;• Transaction ID generation&#xa;• Callback to middleware" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffcc99;strokeColor=#ff9933;fontSize=12;align=center;" vertex="1" parent="1">
+          <mxGeometry x="560" y="200" width="160" height="100" as="geometry" />
+        </mxCell>
+        
+        <!-- Payment Complete -->
+        <mxCell id="payment-complete" value="✅ Payment Complete&#xa;(/payment-complete)&#xa;&#xa;• Transaction details&#xa;• Auto-Capture button&#xa;• Mark as Paid button&#xa;• Order Confirmation&#xa;• Real transaction ID display" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=12;align=center;" vertex="1" parent="1">
+          <mxGeometry x="800" y="200" width="160" height="100" as="geometry" />
+        </mxCell>
+        
+        <!-- VPS Setup -->
+        <mxCell id="vps-setup" value="⚙️ VPS Setup&#xa;(/vps-setup)&#xa;&#xa;• OS selection&#xa;• Hostname configuration&#xa;• Root password&#xa;• SSH keys (optional)&#xa;• Additional options" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=12;align=center;" vertex="1" parent="1">
+          <mxGeometry x="320" y="360" width="160" height="100" as="geometry" />
+        </mxCell>
+        
+        <!-- VPS Dashboard -->
+        <mxCell id="vps-dashboard" value="📊 VPS Dashboard&#xa;(/vps-dashboard)&#xa;&#xa;• Server information&#xa;• Resource usage graphs&#xa;• Control buttons&#xa;• Management interface&#xa;• Hostinger-style UI" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=12;align=center;" vertex="1" parent="1">
+          <mxGeometry x="560" y="360" width="160" height="100" as="geometry" />
+        </mxCell>
+        
+        <!-- Middleware API -->
+        <mxCell id="middleware" value="🔧 Middleware API&#xa;(Port 3005)&#xa;&#xa;• Products API&#xa;• Payment methods API&#xa;• Order creation&#xa;• Payment processing&#xa;• HostBill integration" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e6f3ff;strokeColor=#0066cc;fontSize=12;align=center;" vertex="1" parent="1">
+          <mxGeometry x="80" y="520" width="160" height="100" as="geometry" />
+        </mxCell>
+        
+        <!-- HostBill -->
+        <mxCell id="hostbill" value="📊 HostBill&#xa;(External)&#xa;&#xa;• Order management&#xa;• Invoice generation&#xa;• Customer database&#xa;• Billing automation&#xa;• Product catalog" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#ff9900;fontSize=12;align=center;" vertex="1" parent="1">
+          <mxGeometry x="320" y="520" width="160" height="100" as="geometry" />
+        </mxCell>
+        
+        <!-- ComGate -->
+        <mxCell id="comgate" value="💰 ComGate API&#xa;(External)&#xa;&#xa;• Payment processing&#xa;• Transaction management&#xa;• Callback handling&#xa;• Real transaction IDs&#xa;• Payment gateway" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffcccc;strokeColor=#cc0000;fontSize=12;align=center;" vertex="1" parent="1">
+          <mxGeometry x="560" y="520" width="160" height="100" as="geometry" />
+        </mxCell>
+        
+        <!-- Flow Arrows -->
+        <mxCell id="arrow1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#666666;" edge="1" parent="1" source="landing" target="vps">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="arrow2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#666666;" edge="1" parent="1" source="vps" target="cart">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="arrow3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#666666;" edge="1" parent="1" source="cart" target="register">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="arrow4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#666666;" edge="1" parent="1" source="register" target="billing">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="880" y="170" />
+              <mxPoint x="160" y="170" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="arrow5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#666666;" edge="1" parent="1" source="billing" target="payment-method">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="arrow6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#666666;" edge="1" parent="1" source="payment-method" target="payment-gateway">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="arrow7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#666666;" edge="1" parent="1" source="payment-gateway" target="payment-complete">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="arrow8" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#666666;" edge="1" parent="1" source="payment-complete" target="vps-setup">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="880" y="330" />
+              <mxPoint x="400" y="330" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="arrow9" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#666666;" edge="1" parent="1" source="vps-setup" target="vps-dashboard">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- API Connections -->
+        <mxCell id="api1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=1;strokeColor=#0066cc;dashed=1;" edge="1" parent="1" source="vps" target="middleware">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="400" y="480" />
+              <mxPoint x="160" y="480" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="api2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=1;strokeColor=#0066cc;dashed=1;" edge="1" parent="1" source="billing" target="hostbill">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="160" y="480" />
+              <mxPoint x="400" y="480" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="api3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=1;strokeColor=#0066cc;dashed=1;" edge="1" parent="1" source="payment-method" target="middleware">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="400" y="480" />
+              <mxPoint x="160" y="480" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="api4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=1;strokeColor=#cc0000;dashed=1;" edge="1" parent="1" source="payment-gateway" target="comgate">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="640" y="480" />
+              <mxPoint x="640" y="480" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="api5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=1;strokeColor=#0066cc;dashed=1;" edge="1" parent="1" source="middleware" target="hostbill">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- Labels -->
+        <mxCell id="label1" value="User clicks&#xa;&quot;Vyberte si VPS plán&quot;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="240" y="60" width="80" height="30" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="label2" value="User clicks&#xa;&quot;Přidat do košíku&quot;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="480" y="60" width="80" height="30" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="label3" value="User clicks&#xa;&quot;Pokračovat k objednávce&quot;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="720" y="60" width="80" height="30" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="label4" value="OAuth or Email&#xa;Registration" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="500" y="150" width="80" height="30" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="label5" value="User clicks&#xa;&quot;Continue&quot;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="240" y="220" width="80" height="30" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="label6" value="User clicks&#xa;&quot;Dokončit a odeslat&quot;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="480" y="220" width="80" height="30" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="label7" value="Payment&#xa;Completion" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="720" y="220" width="80" height="30" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="label8" value="User clicks&#xa;&quot;Order Confirmation&quot;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="640" y="310" width="80" height="30" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="label9" value="User clicks&#xa;&quot;Create VPS Server&quot;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="480" y="380" width="80" height="30" as="geometry" />
+        </mxCell>
+        
+        <!-- API Labels -->
+        <mxCell id="api-label1" value="Products API" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=9;fontColor=#0066cc;" vertex="1" parent="1">
+          <mxGeometry x="240" y="450" width="60" height="20" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="api-label2" value="Order Creation" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=9;fontColor=#0066cc;" vertex="1" parent="1">
+          <mxGeometry x="240" y="490" width="60" height="20" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="api-label3" value="Payment Init" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=9;fontColor=#0066cc;" vertex="1" parent="1">
+          <mxGeometry x="240" y="350" width="60" height="20" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="api-label4" value="Payment Gateway" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=9;fontColor=#cc0000;" vertex="1" parent="1">
+          <mxGeometry x="640" y="450" width="60" height="20" as="geometry" />
+        </mxCell>
+        
+        <!-- Title -->
+        <mxCell id="title" value="CloudVPS Complete Flow Schema" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=16;fontStyle=1;fontColor=#333333;" vertex="1" parent="1">
+          <mxGeometry x="400" y="10" width="300" height="20" as="geometry" />
+        </mxCell>
+        
+        <!-- Legend -->
+        <mxCell id="legend-bg" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;" vertex="1" parent="1">
+          <mxGeometry x="800" y="520" width="160" height="100" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="legend-title" value="Legend" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="800" y="525" width="160" height="20" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="legend1" value="——— User Flow" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="810" y="545" width="140" height="15" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="legend2" value="- - - - API Calls" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="810" y="560" width="140" height="15" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="legend3" value="🏠 Frontend Pages" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="810" y="575" width="140" height="15" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="legend4" value="🔧 Backend Services" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="810" y="590" width="140" height="15" as="geometry" />
+        </mxCell>
+        
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

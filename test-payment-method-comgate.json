@@ -1,0 +1,16 @@
+{
+  "orderId": "TEST-PAYMENT-METHOD-003",
+  "invoiceId": "INV-PAYMENT-METHOD-003",
+  "method": "comgate",
+  "amount": 1200,
+  "currency": "CZK",
+  "customerData": {
+    "email": "test@example.com",
+    "name": "Test Customer"
+  },
+  "testFlow": true,
+  "returnUrl": "http://localhost:3000/payment-complete",
+  "billingPeriod": "6",
+  "selectedOS": "ubuntu",
+  "appliedPromo": "SAVE15"
+}

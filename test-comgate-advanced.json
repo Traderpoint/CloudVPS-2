@@ -1,0 +1,11 @@
+{
+  "orderId": "TEST-456",
+  "invoiceId": "INV-456",
+  "method": "comgate_advanced",
+  "amount": 1500,
+  "currency": "CZK",
+  "customerData": {
+    "email": "test@example.com",
+    "name": "Test User"
+  }
+}

@@ -1,0 +1,917 @@
+#### `.env.local`
+```env
+NEXT_PUBLIC_GOOGLE_CLIENT_ID=vaše-client-id.apps.googleusercontent.com
+NEXT_PUBLIC_HOSTBILL_URL=http://your-hostbill-url.com/admin/api.php
+HOSTBILL_API_ID=YOUR_API_ID
+HOSTBILL_API_KEY=YOUR_API_KEY
+DATIVERY_API_KEY=YOUR_DATIVERY_API_KEY
+DATIVERY_API_URL=https://api.dativery.com/v1
+POHODA_DATA_FILE=StwPh_ICO_YYYY.mdb
+POHODA_USERNAME=YOUR_POHODA_USERNAME
+POHODA_PASSWORD=YOUR_POHODA_PASSWORD
+```
+
+#### `.gitignore`
+```
+node_modules/
+.next/
+out/
+.env.local
+```
+
+#### `next.config.js`
+```javascript
+module.exports = {
+  reactStrictMode: true,
+}
+```
+
+#### `package.json`
+```json
+{
+  "name": "eshop-app",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@react-oauth/google": "^0.12.1",
+    "jwt-decode": "^4.0.0",
+    "next": "14.2.3",
+    "react": "^18",
+    "react-dom": "^18",
+    "tailwindcss": "^3.4.1",
+    "xmlbuilder2": "^3.1.1"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.4.47"
+  }
+}
+```
+
+#### `postcss.config.js`
+```javascript
+module.exports = {
+  plugins: {
+    tailwindcss: {},
+    autoprefixer: {},
+  },
+}
+```
+
+#### `tailwind.config.js`
+```javascript
+module.exports = {
+  content: [
+    "./pages/**/*.{js,ts,jsx,tsx}",
+    "./components/**/*.{js,ts,jsx,tsx}",
+  ],
+  theme: {
+    extend: {},
+  },
+  plugins: [],
+}
+```
+
+#### `pages/_app.js`
+```javascript
+export default function App({ Component, pageProps }) {
+  return <Component {...pageProps} />
+}
+```
+
+#### `pages/api/create-hostbill-client.js`
+```javascript
+export default async function handler(req, res) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  const { email, name, companyData } = req.body;
+  const apiId = process.env.HOSTBILL_API_ID;
+  const apiKey = process.env.HOSTBILL_API_KEY;
+  const hostbillUrl = process.env.HOSTBILL_URL;
+
+  try {
+    const response = await fetch(`${hostbillUrl}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        api_id: apiId,
+        api_key: apiKey,
+        call: 'addClient',
+        firstname: name.split(' ')[0],
+        lastname: name.split(' ').slice(1).join(' ') || 'Unknown',
+        email,
+        company: companyData?.obchodniJmeno || '',
+        address1: companyData?.adresa || '',
+        vat_id: companyData?.dic || '',
+        status: 'Pending'
+      }),
+    });
+
+    const data = await response.json();
+    if (data.success) {
+      res.status(200).json({ clientId: data.result.id });
+    } else {
+      res.status(400).json({ error: data.error || 'Failed to create client' });
+    }
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to communicate with HostBill API: ' + error.message });
+  }
+}
+```
+
+#### `pages/api/create-hostbill-order.js`
+```javascript
+export default async function handler(req, res) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  const { clientId, cartItems, totalPrice } = req.body;
+  const apiId = process.env.HOSTBILL_API_ID;
+  const apiKey = process.env.HOSTBILL_API_KEY;
+  const hostbillUrl = process.env.HOSTBILL_URL;
+
+  try {
+    const items = cartItems.map(item => ({
+      item_id: item.id,
+      quantity: item.quantity,
+      description: item.name,
+      price: item.price
+    }));
+
+    const response = await fetch(`${hostbillUrl}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        api_id: apiId,
+        api_key: apiKey,
+        call: 'addOrder',
+        client_id: clientId,
+        total: totalPrice,
+        items: JSON.stringify(items),
+        status: 'Pending'
+      }),
+    });
+
+    const data = await response.json();
+    if (data.success) {
+      res.status(200).json({ orderId: data.result.id });
+    } else {
+      res.status(400).json({ error: data.error || 'Failed to create order' });
+    }
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to communicate with HostBill API: ' + error.message });
+  }
+}
+```
+
+#### `pages/api/login-hostbill.js`
+```javascript
+export default async function handler(req, res) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  const { email, password } = req.body;
+  const apiId = process.env.HOSTBILL_API_ID;
+  const apiKey = process.env.HOSTBILL_API_KEY;
+  const hostbillUrl = process.env.HOSTBILL_URL;
+
+  try {
+    const response = await fetch(`${hostbillUrl}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        api_id: apiId,
+        api_key: apiKey,
+        call: 'authClient',
+        email,
+        password
+      }),
+    });
+
+    const data = await response.json();
+    if (data.success && data.result.authenticated) {
+      res.status(200).json({
+        success: true,
+        clientId: data.result.client_id,
+        name: data.result.firstname + ' ' + data.result.lastname
+      });
+    } else {
+      res.status(401).json({ error: data.error || 'Neplatný e-mail nebo heslo' });
+    }
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to communicate with HostBill API: ' + error.message });
+  }
+}
+```
+
+#### `pages/api/send-hostbill-email.js`
+```javascript
+export default async function handler(req, res) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  const { clientId, email } = req.body;
+  const apiId = process.env.HOSTBILL_API_ID;
+  const apiKey = process.env.HOSTBILL_API_KEY;
+  const hostbillUrl = process.env.HOSTBILL_URL;
+
+  try {
+    const response = await fetch(`${hostbillUrl}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        api_id: apiId,
+        api_key: apiKey,
+        call: 'sendClientEmail',
+        client_id: clientId,
+        email_type: 'client_welcome',
+        to: email
+      }),
+    });
+
+    const data = await response.json();
+    if (data.success) {
+      res.status(200).json({ success: true });
+    } else {
+      res.status(400).json({ error: data.error || 'Failed to send email' });
+    }
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to communicate with HostBill API: ' + error.message });
+  }
+}
+```
+
+#### `pages/api/sync-pohoda.js`
+```javascript
+import { create } from 'xmlbuilder2';
+
+export default async function handler(req, res) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  const { clientId, orderId, cartItems, totalPrice, companyData, email, name } = req.body;
+  const dativeryApiKey = process.env.DATIVERY_API_KEY;
+  const dativeryApiUrl = process.env.DATIVERY_API_URL;
+  const pohodaDataFile = process.env.POHODA_DATA_FILE;
+  const pohodaUsername = process.env.POHODA_USERNAME;
+  const pohodaPassword = process.env.POHODA_PASSWORD;
+
+  try {
+    const xmlObj = {
+      dataPack: {
+        '@version': '2.0',
+        '@application': 'Next.js E-shop',
+        dataPackItem: {
+          '@version': '2.0',
+          order: {
+            '@action': 'create',
+            orderHeader: {
+              orderType: 'receivedOrder',
+              numberOrder: orderId,
+              date: new Date().toISOString().split('T')[0],
+              partnerIdentity: {
+                name: companyData.obchodniJmeno,
+                company: companyData.obchodniJmeno,
+                ico: companyData.ico,
+                dic: companyData.dic,
+                address: {
+                  street: companyData.adresa.split(', ')[1] || '',
+                  city: companyData.adresa.split(', ')[0] || '',
+                },
+                email
+              },
+              totalPrice: totalPrice.toString(),
+              currency: 'CZK'
+            },
+            orderDetail: cartItems.map(item => ({
+              orderItem: {
+                quantity: item.quantity.toString(),
+                text: item.name,
+                unitPrice: (item.price / item.quantity).toString(),
+                totalPrice: (item.price * item.quantity).toString(),
+                stockItem: {
+                  code: item.id.toString()
+                }
+              }
+            }))
+          }
+        }
+      }
+    };
+
+    const xml = create(xmlObj).end({ prettyPrint: true });
+
+    const response = await fetch(`${dativeryApiUrl}/pohoda/import`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/xml',
+        'Authorization': `Bearer ${dativeryApiKey}`
+      },
+      body: xml,
+      credentials: {
+        username: pohodaUsername,
+        password: pohodaPassword,
+        dataFile: pohodaDataFile
+      }
+    });
+
+    const result = await response.json();
+    if (result.success) {
+      res.status(200).json({ success: true });
+    } else {
+      res.status(400).json({ error: result.error || 'Failed to sync with Pohoda' });
+    }
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to communicate with Dativery/Pohoda API: ' + error.message });
+  }
+}
+```
+
+#### `pages/api/verify-email.js`
+```javascript
+export default async function handler(req, res) {
+  if (req.method !== 'GET') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  const { client_id, token } = req.query;
+  const apiId = process.env.HOSTBILL_API_ID;
+  const apiKey = process.env.HOSTBILL_API_KEY;
+  const hostbillUrl = process.env.HOSTBILL_URL;
+
+  try {
+    const response = await fetch(`${hostbillUrl}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        api_id: apiId,
+        api_key: apiKey,
+        call: 'updateClient',
+        client_id,
+        status: 'Active'
+      }),
+    });
+
+    const data = await response.json();
+    if (data.success) {
+      res.redirect('/nextsteps');
+    } else {
+      res.status(400).json({ error: data.error || 'Failed to verify email' });
+    }
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to communicate with HostBill API: ' + error.message });
+  }
+}
+```
+
+#### `pages/cart.js`
+```javascript
+import { useState } from 'react';
+import { useRouter } from 'next/router';
+
+export default function Cart() {
+  const [cartItems, setCartItems] = useState([
+    { id: 1, name: 'Hosting Basic', price: 1000, quantity: 1 },
+    { id: 2, name: 'Domain Registration', price: 300, quantity: 1 },
+  ]);
+  const router = useRouter();
+
+  const totalPrice = cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
+
+  const handleConfirmPurchase = () => {
+    sessionStorage.setItem('cart', JSON.stringify({ items: cartItems, totalPrice }));
+    router.push('/login');
+  };
+
+  return (
+    <div className="container mx-auto p-4 max-w-2xl">
+      <h1 className="text-2xl font-bold mb-4">Nákupní košík</h1>
+      <div className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
+        <h2 className="text-xl font-bold mb-4">Položky v košíku</h2>
+        {cartItems.map(item => (
+          <div key={item.id} className="flex justify-between mb-2">
+            <span>{item.name} (x{item.quantity})</span>
+            <span>{item.price * item.quantity} Kč</span>
+          </div>
+        ))}
+        <div className="flex justify-between font-bold mt-4">
+          <span>Celkem:</span>
+          <span>{totalPrice} Kč</span>
+        </div>
+        <button
+          onClick={handleConfirmPurchase}
+          className="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full"
+        >
+          Potvrdit nákup
+        </button>
+      </div>
+    </div>
+  );
+}
+```
+
+#### `pages/checkout.js`
+```javascript
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/router';
+
+export default function Checkout() {
+  const [ico, setIco] = useState('');
+  const [companyData, setCompanyData] = useState(null);
+  const [error, setError] = useState(null);
+  const [successMessage, setSuccessMessage] = useState(null);
+  const [user, setUser] = useState(null);
+  const [cart, setCart] = useState(null);
+  const router = useRouter();
+
+  useEffect(() => {
+    const storedUser = sessionStorage.getItem('user');
+    const storedCart = sessionStorage.getItem('cart');
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    } else {
+      router.push('/login');
+    }
+    if (storedCart) {
+      setCart(JSON.parse(storedCart));
+    } else {
+      setError('Košík je prázdný. Vraťte se na stránku košíku.');
+    }
+  }, [router]);
+
+  const handleIcoChange = (event) => {
+    const value = event.target.value;
+    if (/^\d{0,8}$/.test(value)) {
+      setIco(value);
+    }
+  };
+
+  const fetchCompanyData = async () => {
+    setError(null);
+    try {
+      const response = await fetch(`https://wwwinfo.mfcr.cz/cgi-bin/ares/darv_bas.cgi?ico=${ico}`);
+      const data = await response.text();
+      const parser = new DOMParser();
+      const xmlDoc = parser.parseFromString(data, "text/xml");
+      const obchodniJmeno = xmlDoc.getElementsByTagName("ObchodniJmeno")[0]?.textContent || 'Nenalezeno';
+      const sidlo = xmlDoc.getElementsByTagName("Sidlo")[0];
+      const adresa = sidlo ? `${sidlo.getElementsByTagName("NazevObce")[0]?.textContent || ''}, ${sidlo.getElementsByTagName("NazevUlice")[0]?.textContent || ''} ${sidlo.getElementsByTagName("CisloDomovni")[0]?.textContent || ''}` : 'Nenalezeno';
+      const dic = xmlDoc.getElementsByTagName("Dic")[0]?.textContent || 'Nenalezeno';
+      const pravniForma = xmlDoc.getElementsByTagName("PravniForma")[0]?.textContent || 'Nenalezeno';
+      const datumVzniku = xmlDoc.getElementsByTagName("DatumVzniku")[0]?.textContent || 'Nenalezeno';
+
+      if (obchodniJmeno !== 'Nenalezeno') {
+        setCompanyData({ obchodniJmeno, adresa, dic, pravniForma, datumVzniku });
+      } else {
+        setError('IČO nenalezeno nebo neplatné.');
+      }
+    } catch (err) {
+      setError('Chyba při načítání dat. Zkuste to znovu.');
+    }
+  };
+
+  useEffect(() => {
+    if (ico.length === 8) {
+      fetchCompanyData();
+    } else {
+      setCompanyData(null);
+      setError(null);
+    }
+  }, [ico]);
+
+  const handleLogout = () => {
+    sessionStorage.removeItem('user');
+    setUser(null);
+    router.push('/login');
+  };
+
+  const createHostbillClientAndOrder = async () => {
+    if (!user || !companyData || !cart) {
+      setError('Přihlaste se, vyplňte IČO a ověřte košík pro vytvoření klienta a objednávky.');
+      return;
+    }
+
+    setError(null);
+    setSuccessMessage(null);
+
+    try {
+      let clientId = user.clientId;
+      if (!clientId) {
+        const clientResponse = await fetch('/api/create-hostbill-client', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: user.email,
+            name: user.name,
+            companyData
+          }),
+        });
+
+        const clientResult = await clientResponse.json();
+        if (!clientResult.clientId) {
+          setError('Chyba při vytváření klienta: ' + clientResult.error);
+          return;
+        }
+        clientId = clientResult.clientId;
+        sessionStorage.setItem('user', JSON.stringify({ ...user, clientId }));
+      }
+
+      const orderResponse = await fetch('/api/create-hostbill-order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          clientId,
+          cartItems: cart.items,
+          totalPrice: cart.totalPrice
+        }),
+      });
+
+      const orderResult = await orderResponse.json();
+      if (!orderResult.orderId) {
+        setError('Chyba při vytváření objednávky: ' + orderResult.error);
+        return;
+      }
+
+      const pohodaResponse = await fetch('/api/sync-pohoda', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          clientId,
+          orderId: orderResult.orderId,
+          cartItems: cart.items,
+          totalPrice: cart.totalPrice,
+          companyData,
+          email: user.email,
+          name: user.name
+        }),
+      });
+
+      const pohodaResult = await pohodaResponse.json();
+      if (!pohodaResult.success) {
+        setError('Chyba při synchronizaci s Pohodou: ' + pohodaResult.error);
+        return;
+      }
+
+      if (!user.clientId) {
+        const emailResponse = await fetch('/api/send-hostbill-email', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ clientId, email: user.email }),
+        });
+
+        const emailResult = await emailResponse.json();
+        if (!emailResult.success) {
+          setError('Klient a objednávka vytvořeny, ale odeslání potvrzovacího e-mailu selhalo: ' + emailResult.error);
+          return;
+        }
+      }
+
+      setSuccessMessage('Klient, objednávka a synchronizace s Pohodou byly úspěšně dokončeny. Potvrzovací e-mail byl odeslán (pokud jste nový uživatel).');
+    } catch (err) {
+      setError('Chyba při komunikaci s API: ' + err.message);
+    }
+  };
+
+  if (!user) {
+    return <div className="container mx-auto p-4 max-w-2xl">Přesměrování na přihlášení...</div>;
+  }
+
+  return (
+    <div className="container mx-auto p-4 max-w-2xl">
+      <h1 className="text-2xl font-bold mb-4">Dokončení nákupu</h1>
+      
+      {cart && (
+        <div className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
+          <h2 className="text-xl font-bold mb-4">Položky v košíku</h2>
+          {cart.items.map(item => (
+            <div key={item.id} className="flex justify-between mb-2">
+              <span>{item.name} (x{item.quantity})</span>
+              <span>{item.price * item.quantity} Kč</span>
+            </div>
+          ))}
+          <div className="flex justify-between font-bold mt-4">
+            <span>Celkem:</span>
+            <span>{cart.totalPrice} Kč</span>
+          </div>
+        </div>
+      )}
+
+      <div className="mb-4">
+        <div className="flex items-center space-x-4">
+          <img src={user.picture || '/default-avatar.png'} alt="Profile" className="w-10 h-10 rounded-full" />
+          <div>
+            <p className="text-gray-700">Přihlášen jako: {user.name}</p>
+            <p className="text-gray-500 text-sm">{user.email}</p>
+            <button
+              onClick={handleLogout}
+              className="mt-2 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+            >
+              Odhlásit
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div className="mb-4">
+        <label className="block text-gray-700 text-sm font-bold mb-2">
+          Zadejte IČO:
+          <input
+            type="text"
+            value={ico}
+            onChange={handleIcoChange}
+            maxLength="8"
+            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+          />
+        </label>
+      </div>
+      {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
+      {successMessage && <p className="text-green-500 text-sm mb-4">{successMessage}</p>}
+      {companyData && (
+        <div className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
+          <h2 className="text-xl font-bold mb-4">Načtená data:</h2>
+          <div className="mb-4">
+            <label className="block text-gray-700 text-sm font-bold mb-2">
+              Název firmy:
+              <input
+                type="text"
+                value={companyData.obchodniJmeno}
+                readOnly
+                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight bg-gray-100"
+              />
+            </label>
+          </div>
+          <div className="mb-4">
+            <label className="block text-gray-700 text-sm font-bold mb-2">
+              Adresa:
+              <input
+                type="text"
+                value={companyData.adresa}
+                readOnly
+                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight bg-gray-100"
+              />
+            </label>
+          </div>
+          <div className="mb-4">
+            <label className="block text-gray-700 text-sm font-bold mb-2">
+              DIČ:
+              <input
+                type="text"
+                value={companyData.dic}
+                readOnly
+                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight bg-gray-100"
+              />
+            </label>
+          </div>
+          <div className="mb-4">
+            <label className="block text-gray-700 text-sm font-bold mb-2">
+              Právní forma:
+              <input
+                type="text"
+                value={companyData.pravniForma}
+                readOnly
+                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight bg-gray-100"
+              />
+            </label>
+          </div>
+          <div className="mb-4">
+            <label className="block text-gray-700 text-sm font-bold mb-2">
+              Datum vzniku:
+              <input
+                type="text"
+                value={companyData.datumVzniku}
+                readOnly
+                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight bg-gray-100"
+              />
+            </label>
+          </div>
+          <button
+            onClick={createHostbillClientAndOrder}
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full"
+            disabled={!user || !companyData || !cart}
+          >
+            Dokončit registraci a vytvořit objednávku
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+```
+
+#### `pages/dashboard.js`
+```javascript
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/router';
+
+export default function Dashboard() {
+  const [user, setUser] = useState(null);
+  const router = useRouter();
+
+  useEffect(() => {
+    const storedUser = sessionStorage.getItem('user');
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    } else {
+      router.push('/login');
+    }
+  }, [router]);
+
+  const handleLogout = () => {
+    sessionStorage.removeItem('user');
+    router.push('/login');
+  };
+
+  if (!user) {
+    return <div className="container mx-auto p-4 max-w-2xl">Přesměrování na přihlášení...</div>;
+  }
+
+  return (
+    <div className="container mx-auto p-4 max-w-2xl">
+      <h1 className="text-2xl font-bold mb-4">Uživatelský panel</h1>
+      <div className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
+        <div className="flex items-center space-x-4 mb-4">
+          <img src={user.picture || '/default-avatar.png'} alt="Profile" className="w-10 h-10 rounded-full" />
+          <div>
+            <p className="text-gray-700">Přihlášen jako: {user.name}</p>
+            <p className="text-gray-500 text-sm">{user.email}</p>
+          </div>
+        </div>
+        <p className="text-gray-700 mb-4">Vítejte v uživatelském panelu! Zde můžete spravovat své objednávky a služby.</p>
+        <button
+          onClick={handleLogout}
+          className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+        >
+          Odhlásit
+        </button>
+      </div>
+    </div>
+  );
+}
+```
+
+#### `pages/login.js`
+```javascript
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/router';
+import { GoogleLogin, GoogleOAuthProvider } from '@react-oauth/google';
+import jwtDecode from 'jwt-decode';
+
+export default function Login() {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState(null);
+  const router = useRouter();
+
+  useEffect(() => {
+    const storedUser = sessionStorage.getItem('user');
+    if (storedUser) {
+      const cart = sessionStorage.getItem('cart');
+      router.push(cart ? '/checkout' : '/dashboard');
+    }
+  }, [router]);
+
+  const handleEmailLogin = async (e) => {
+    e.preventDefault();
+    setError(null);
+
+    try {
+      const response = await fetch('/api/login-hostbill', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const result = await response.json();
+      if (result.success) {
+        const user = {
+          email,
+          name: result.name || email,
+          clientId: result.clientId,
+          picture: '/default-avatar.png'
+        };
+        sessionStorage.setItem('user', JSON.stringify(user));
+        const cart = sessionStorage.getItem('cart');
+        router.push(cart ? '/checkout' : '/dashboard');
+      } else {
+        setError(result.error || 'Přihlášení selhalo. Zkontrolujte e-mail a heslo.');
+      }
+    } catch (err) {
+      setError('Chyba při komunikaci s HostBill API: ' + err.message);
+    }
+  };
+
+  const handleGoogleLoginSuccess = (credentialResponse) => {
+    const decoded = jwtDecode(credentialResponse.credential);
+    const user = {
+      email: decoded.email,
+      name: decoded.name,
+      picture: decoded.picture,
+      sub: decoded.sub
+    };
+    sessionStorage.setItem('user', JSON.stringify(user));
+    const cart = sessionStorage.getItem('cart');
+    router.push(cart ? '/checkout' : '/dashboard');
+  };
+
+  const handleGoogleLoginError = () => {
+    setError('Přihlášení přes Google selhalo. Zkuste to znovu.');
+  };
+
+  return (
+    <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID}>
+      <div className="container mx-auto p-4 max-w-md">
+        <h1 className="text-2xl font-bold mb-4">Přihlášení</h1>
+        <div className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
+          <h2 className="text-xl font-bold mb-4">Přihlásit se přes e-mail</h2>
+          <form onSubmit={handleEmailLogin}>
+            <div className="mb-4">
+              <label className="block text-gray-700 text-sm font-bold mb-2">
+                E-mail:
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                  required
+                />
+              </label>
+            </div>
+            <div className="mb-4">
+              <label className="block text-gray-700 text-sm font-bold mb-2">
+                Heslo:
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                  required
+                />
+              </label>
+            </div>
+            {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
+            <button
+              type="submit"
+              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full"
+            >
+              Přihlásit se
+            </button>
+          </form>
+          <div className="mt-4">
+            <h2 className="text-xl font-bold mb-4">Nebo přes Google</h2>
+            <GoogleLogin
+              onSuccess={handleGoogleLoginSuccess}
+              onError={handleGoogleLoginError}
+              useOneTap
+            />
+          </div>
+        </div>
+      </div>
+    </GoogleOAuthProvider>
+  );
+}
+```
+
+#### `pages/nextsteps.js`
+```javascript
+export default function NextSteps() {
+  return (
+    <div className="container mx-auto p-4 max-w-2xl">
+      <h1 className="text-2xl font-bold mb-4">Účet aktivován</h1>
+      <p className="text-green-500 text-lg mb-4">
+        Váš e-mail byl úspěšně potvrzen a účet je nyní aktivní.
+      </p>
+      <p className="text-gray-700">
+        Vaše objednávka byla vytvořena. Nyní můžete pokračovat s nastavením služeb nebo dokončením platby.
+      </p>
+      <a
+        href="/"
+        className="mt-4 inline-block bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+      >
+        Zpět na hlavní stránku
+      </a>
+    </div>
+  );
+}
+```
+
+#### `styles/globals.css`
+```css
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+```
+
+#### `public/default-avatar.png`
+- Placeholder obrázek (PNG formát). Můžete použít libovolný PNG obrázek (např. jednoduchý avatar). Pokud nemáte obrázek, vytvořte prázdný PNG soubor nebo stáhněte ukázkový avatar z internetu (např. z Unsplash nebo jiného zdroje s volnou licencí).

@@ -1,0 +1,32 @@
+{
+  "type": "complete",
+  "customer": {
+    "firstName": "Test",
+    "lastName": "Customer",
+    "email": "test@example.com",
+    "phone": "+420123456789",
+    "address": "Test Address 123",
+    "city": "Prague",
+    "zip": "12000",
+    "country": "CZ"
+  },
+  "items": [
+    {
+      "productId": "1",
+      "name": "VPS Basic",
+      "price": 1200,
+      "quantity": 1,
+      "cycle": "m"
+    },
+    {
+      "productId": "2", 
+      "name": "VPS Pro",
+      "price": 1190,
+      "quantity": 1,
+      "cycle": "m"
+    }
+  ],
+  "paymentMethod": "banktransfer",
+  "total": 2390,
+  "currency": "CZK"
+}

@@ -1,0 +1,15 @@
+{
+  "orderId": "TEST-ORDER-123",
+  "invoiceId": "398",
+  "method": "comgate",
+  "amount": 2390,
+  "currency": "CZK",
+  "testFlow": false,
+  "returnUrl": "http://localhost:3000/payment-success?invoiceId=398&orderId=TEST-ORDER-123&amount=2390&paymentMethod=comgate",
+  "cancelUrl": "http://localhost:3000/payment-failed?reason=cancelled&invoiceId=398&orderId=TEST-ORDER-123&amount=2390&paymentMethod=comgate",
+  "pendingUrl": "http://localhost:3000/payment-success?status=pending&invoiceId=398&orderId=TEST-ORDER-123&amount=2390&paymentMethod=comgate",
+  "customerData": {
+    "email": "test@example.com",
+    "name": "Test Customer"
+  }
+}

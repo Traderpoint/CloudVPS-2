@@ -1,0 +1,15 @@
+{
+  "orderId": "TEST-123",
+  "invoiceId": "INV-123",
+  "method": "comgate",
+  "amount": 1500,
+  "currency": "CZK",
+  "billingPeriod": "24",
+  "selectedOS": "windows",
+  "returnUrl": "http://localhost:3000/payment-complete",
+  "testFlow": true,
+  "customerData": {
+    "email": "test@example.com",
+    "name": "Test User"
+  }
+}
