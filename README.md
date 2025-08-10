@@ -2,6 +2,40 @@
 
 Kompletní řešení pro HostBill včetně affiliate tracking systému a custom modulů.
 
+## 🔐 DŮLEŽITÉ - Bezpečnostní Setup
+
+**PŘED SPUŠTĚNÍM APLIKACE** musíte nakonfigurovat citlivé informace:
+
+### 1. Environment Variables
+```bash
+# Zkopírujte example soubory a vyplňte skutečné hodnoty
+cp .env.example .env
+cp .env.example .env.local
+
+# Editujte soubory a vyplňte:
+# - Google OAuth Client ID a Secret
+# - HostBill API přístupy
+# - Google Maps API klíč
+# - NextAuth secret
+```
+
+### 2. Dokumentační soubory
+```bash
+# Zkopírujte example soubory
+cp ENVIRONMENT-SETUP.md.example ENVIRONMENT-SETUP.md
+cp TEST_PORTAL_ENV_ANALYSIS.md.example TEST_PORTAL_ENV_ANALYSIS.md
+
+# Editujte a vyplňte skutečné hodnoty
+```
+
+### 3. Gitignore Protection
+Následující soubory jsou automaticky ignorovány Gitem:
+- `.env` a `.env.local`
+- `ENVIRONMENT-SETUP.md`
+- `TEST_PORTAL_ENV_ANALYSIS.md`
+
+**⚠️ NIKDY necommitujte tyto soubory s reálnými API klíči!**
+
 ## 🎯 Funkce
 
 ### ✅ Implementované funkce:
