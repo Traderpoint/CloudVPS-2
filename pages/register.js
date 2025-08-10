@@ -3,10 +3,12 @@ import { useRouter } from 'next/router';
 import { signIn, useSession } from 'next-auth/react';
 import Link from 'next/link';
 import Head from 'next/head';
+import { getServerSessionProps } from '../lib/getServerSessionProps';
 
-export default function Register() {
+export default function Register({ serverSession }) {
   const router = useRouter();
-  const { data: session, status } = useSession();
+  const { data: clientSession, status } = useSession();
+  const session = clientSession ?? serverSession;
 
   const [formData, setFormData] = useState({
     email: '',
@@ -517,3 +519,6 @@ export default function Register() {
     </>
   );
 }
+
+// jednoduché volání
+export const getServerSideProps = getServerSessionProps;

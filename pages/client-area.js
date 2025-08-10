@@ -14,10 +14,12 @@ import ClientQuickActions from '../components/ClientQuickActions';
 import ClientRecentActivity from '../components/ClientRecentActivity';
 import ClientProfileCard from '../components/ClientProfileCard';
 import AuthDebug from '../components/AuthDebug';
+import { getServerSessionProps } from '../lib/getServerSessionProps';
 
-export default function ClientArea() {
+export default function ClientArea({ serverSession }) {
   const router = useRouter();
-  const { data: session, status: sessionStatus } = useSession();
+  const { data: clientSession, status: sessionStatus } = useSession();
+  const session = clientSession ?? serverSession;
   const { user: authUser, isAuthenticated, isLoading: authLoading } = useAuth();
   const [user, setUser] = useState(null);
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -1076,3 +1078,6 @@ export default function ClientArea() {
     </div>
   );
 }
+
+// jednoduché volání
+export const getServerSideProps = getServerSessionProps;

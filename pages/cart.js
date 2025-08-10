@@ -3,10 +3,12 @@ import { useRouter } from 'next/router';
 import { useSession } from 'next-auth/react';
 import { useCart } from '../contexts/CartContext';
 import Link from 'next/link';
+import { getServerSessionProps } from '../lib/getServerSessionProps';
 
-export default function Cart() {
+export default function Cart({ serverSession }) {
   const router = useRouter();
-  const { data: session, status } = useSession();
+  const { data: clientSession, status } = useSession();
+  const session = clientSession ?? serverSession;
   const { items, getTotalPrice, updateItemPeriod, removeItem, updateQuantity } = useCart();
   const [selectedPeriod, setSelectedPeriod] = useState('12');
   const [selectedOS, setSelectedOS] = useState('linux');
@@ -759,3 +761,6 @@ export default function Cart() {
     </div>
   );
 }
+
+// jednoduché volání
+export const getServerSideProps = getServerSessionProps;

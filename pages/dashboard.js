@@ -3,9 +3,11 @@ import { useEffect, useState } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
 import Navbar from '../components/Navbar';
+import { getServerSessionProps } from '../lib/getServerSessionProps';
 
-export default function Dashboard() {
-  const { data: session, status } = useSession();
+export default function Dashboard({ serverSession }) {
+  const { data: clientSession, status } = useSession();
+  const session = clientSession ?? serverSession;
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -145,3 +147,6 @@ export default function Dashboard() {
     </>
   );
 }
+
+// jednoduché volání
+export const getServerSideProps = getServerSessionProps;

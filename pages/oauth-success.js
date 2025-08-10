@@ -2,9 +2,11 @@ import { useEffect, useState } from 'react';
 import { useSession, signOut } from 'next-auth/react';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
+import { getServerSessionProps } from '../lib/getServerSessionProps';
 
-export default function OAuthSuccess() {
-  const { data: session, status } = useSession();
+export default function OAuthSuccess({ serverSession }) {
+  const { data: clientSession, status } = useSession();
+  const session = clientSession ?? serverSession;
   const router = useRouter();
   const [mounted, setMounted] = useState(false);
   const [redirecting, setRedirecting] = useState(false);
@@ -280,3 +282,6 @@ export default function OAuthSuccess() {
     </>
   );
 }
+
+// jednoduché volání
+export const getServerSideProps = getServerSessionProps;

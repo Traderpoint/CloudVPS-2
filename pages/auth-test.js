@@ -1,9 +1,11 @@
 import { useSession, signIn, signOut } from 'next-auth/react';
 import { useEffect } from 'react';
 import { useRouter } from 'next/router';
+import { getServerSessionProps } from '../lib/getServerSessionProps';
 
-export default function AuthTest() {
-  const { data: session, status } = useSession();
+export default function AuthTest({ serverSession }) {
+  const { data: clientSession, status } = useSession();
+  const session = clientSession ?? serverSession;
   const router = useRouter();
 
   useEffect(() => {
@@ -107,3 +109,6 @@ export default function AuthTest() {
     </div>
   );
 }
+
+// jednoduché volání
+export const getServerSideProps = getServerSessionProps;

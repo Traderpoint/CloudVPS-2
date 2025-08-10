@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
 import { signIn, signOut, useSession } from 'next-auth/react';
 import Head from 'next/head';
+import { getServerSessionProps } from '../lib/getServerSessionProps';
 
-export default function MiddlewareOAuthTests() {
-  const { data: session, status: sessionStatus } = useSession();
+export default function MiddlewareOAuthTests({ serverSession }) {
+  const { data: clientSession, status: sessionStatus } = useSession();
+  const session = clientSession ?? serverSession;
   const [mounted, setMounted] = useState(false);
   const [activeTest, setActiveTest] = useState('google'); // 'google' nebo 'email'
   const [authMode, setAuthMode] = useState('login'); // 'login' nebo 'register'
@@ -473,3 +475,6 @@ export default function MiddlewareOAuthTests() {
     </>
   );
 }
+
+// jednoduché volání
+export const getServerSideProps = getServerSessionProps;
